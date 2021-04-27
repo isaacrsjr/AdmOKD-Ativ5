@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-ativ5-dep
+  namespace: univates
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: app-ativ5
+  template:
+    metadata:
+      labels:
+        app: app-ativ5
+    spec:
+      containers:
+      - name: admokd-ativ2-container
+        image: isaacrsjr/adm_okd_ativ2:blue
+        ports:
+          - containerPort: 5000
+
