@@ -180,9 +180,9 @@ kubectl rollout status deployment/app-ativ5-dep --namespace univates
 curl <endereço do cluster>
 
 # para validar as mudanças realizadas
-kubectl rollout history deployment/app-ativ5-dep
+kubectl rollout history deployment/app-ativ5-dep --namespace univates
 
 # para fazer rollback para a versão blue:
-kubectl rollout undo deployment/app-ativ5-dep --to-revision=<número da revisão do comando history>
+kubectl rollout undo deployment/app-ativ5-dep --to-revision=<número da revisão do comando history> --namespace univates
 
 ```
