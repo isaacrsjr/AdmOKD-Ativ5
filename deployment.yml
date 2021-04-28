@@ -5,6 +5,9 @@ metadata:
   namespace: univates
 spec:
   replicas: 2
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
   selector:
     matchLabels:
       app: app-ativ5
@@ -18,4 +21,3 @@ spec:
         image: isaacrsjr/adm_okd_ativ2:blue
         ports:
           - containerPort: 5000
-

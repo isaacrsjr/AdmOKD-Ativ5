@@ -103,6 +103,8 @@ cd /
 git clone https://github.com/isaacrsjr/AdmOKD-Ativ5.git
 cd AdmOKD-Ativ5
 
+kubectl create namespace univates
+
 cat deployment.yml              # somente para exibição do conteúdo
 kubectl apply -f deployment.yml
 
@@ -111,18 +113,76 @@ kubectl get pods --namespace=univates
 cat service.yml                 # somente para exibição do conteúdo
 kubectl apply -f service.yml
 
-kubectl get services --namespace=univates
+kubectl get services --namespace univates
 # execução do curl <clusterIP>:80 para exibir o html do container
 # a porta 80 foi definida no arquivo service.yml
+
+watch -d kubectl get pods --namespace univates
 ```
 
 ## Etapa 3
 
-Comandos Executados no Master (depos de ter feito a etapa 1):
+Nessa etapa editamos o *deployment.yml* conforme:
+
+deployment.yml:
+
+```yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-ativ5-dep
+  namespace: univates
+spec:
+  replicas: 2
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+  selector:
+    matchLabels:
+      app: app-ativ5
+  template:
+    metadata:
+      labels:
+        app: app-ativ5
+    spec:
+      containers:
+      - name: admokd-ativ2-container
+        image: isaacrsjr/adm_okd_ativ2:blue
+        ports:
+          - containerPort: 5000
+```
+
+Em seguida, os comandos Executados no Master (depois de ter feito a etapa 2):
 
 ```bash
+git pull # para obter o novo deployment
+
+kubectl apply -f deployment.yml --record=true
 
 # para acompanhar as alteraçoes:
-watch -d kubectl get pods
-#
+watch -d kubectl get pods --namespace univates
+# ou
+kubectl rollout status deployment/app-ativ5-dep --namespace univates
+
+# para testar a aplicação:
+curl <endereço do cluster>
+
+# editar o deployment para tag green
+vi deployment.yml
+kubectl apply -f deployment.yml --record=true
+
+# para acompanhar as alteraçoes:
+watch -d kubectl get pods --namespace univates
+# ou
+kubectl rollout status deployment/app-ativ5-dep --namespace univates
+
+# para testar a aplicação:
+curl <endereço do cluster>
+
+# para validar as mudanças realizadas
+kubectl rollout history deployment/app-ativ5-dep
+
+# para fazer rollback para a versão blue:
+kubectl rollout undo deployment/app-ativ5-dep --to-revision=<número da revisão do comando history>
+
 ```
